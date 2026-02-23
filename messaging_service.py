@@ -30,16 +30,16 @@ class MessagingService:
             try:
                 from sendgrid import SendGridAPIClient
                 self.sendgrid_client = SendGridAPIClient(self.sendgrid_api_key)
-                print("✅ Email initialized (SendGrid)")
+                print("Email initialized (SendGrid)")
             except ImportError:
-                print("⚠️ SendGrid not installed. Install with: pip install sendgrid")
+                print("SendGrid not installed. Install with: pip install sendgrid")
                 self.sendgrid_client = None
         elif self.smtp_email and self.smtp_password:
             self.sendgrid_client = None
-            print(f"✅ Email initialized (SMTP - {self.email_method})")
+            print(f"Email initialized (SMTP - {self.email_method})")
         else:
             self.sendgrid_client = None
-            print("💡 Email credentials not configured - messages will be printed to console")
+            print("Email credentials not configured - messages will be printed to console")
     
     def send_email(self, to: str, subject: str, body: str, is_html: bool = True) -> bool:
         """
@@ -103,11 +103,11 @@ class MessagingService:
                 server.login(self.smtp_email, self.smtp_password)
                 server.send_message(msg)
             
-            print(f"✅ Email sent successfully to {to} (via {self.email_method})")
+            print(f" Email sent successfully to {to} (via {self.email_method})")
             return True
             
         except Exception as e:
-            print(f"❌ Error sending email to {to}: {e}")
+            print(f" Error sending email to {to}: {e}")
             print(f"Would have sent:")
             print(f"Subject: {subject}")
             print(f"Body:\n{body[:200]}...")
@@ -128,11 +128,11 @@ class MessagingService:
             )
             
             response = self.sendgrid_client.send(message)
-            print(f"✅ Email sent successfully to {to} (via SendGrid)")
+            print(f" Email sent successfully to {to} (via SendGrid)")
             return True
             
         except Exception as e:
-            print(f"❌ Error sending email via SendGrid: {e}")
+            print(f" Error sending email via SendGrid: {e}")
             return False
     
     def send_analysis_report(
@@ -164,35 +164,35 @@ class MessagingService:
         
         # Create email body
         body = f"""
-<h2>Hi {patient_name}! 👋</h2>
+<h2>Hi {patient_name}! </h2>
 
 <p>Your nutrition analysis for <strong>{meal_time}</strong> is ready.</p>
 
-<h3>⚠️ Key Concerns:</h3>
+<h3> Key Concerns:</h3>
 <ul>
 {''.join(f'<li>{concern}</li>' for concern in concerns[:3]) if concerns else '<li>Looking good!</li>'}
 </ul>
 
-<h3>💡 Top Recommendations:</h3>
+<h3> Top Recommendations:</h3>
 <ul>
 {''.join(f'<li>{tip}</li>' for tip in tips[:3]) if tips else '<li>Keep up the good work!</li>'}
 </ul>
 
-<h3>✅ What You Did Right:</h3>
+<h3> What You Did Right:</h3>
 <ul>
 {''.join(f'<li>{note}</li>' for note in positive_notes[:2]) if positive_notes else '<li>Track your next meal!</li>'}
 </ul>
 
 <hr>
 
-<h3>📋 Full Report:</h3>
+<h3> Full Report:</h3>
 <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px;">
 {full_report.replace(chr(10), '<br>')}
 </div>
 
 <p style="margin-top: 30px;">
-Stay healthy! 💪<br>
-<em>- Your Nutrition Team 🏥</em>
+Stay healthy! <br>
+<em>- Your Nutrition Team </em>
 </p>
 """
         
@@ -207,7 +207,7 @@ Stay healthy! 💪<br>
     ) -> bool:
         """Send meal reminder via Email"""
         
-        subject = f"Reminder: Time for {next_meal.title()}! 🍽️"
+        subject = f"Reminder: Time for {next_meal.title()}! "
         
         body = f"""
 <h2>Hi {patient_name}! 🍽️</h2>
@@ -218,7 +218,7 @@ Stay healthy! 💪<br>
 {''.join(f'<li>{rec}</li>' for rec in recommendations[:3])}
 </ul>
 
-<p>Remember your health goals! 💪</p>
+<p>Remember your health goals! </p>
 
 <p><em>- Your Nutrition Team</em></p>
 """
@@ -235,10 +235,10 @@ Stay healthy! 💪<br>
     ) -> bool:
         """Send end-of-day summary via Email"""
         
-        subject = f"Daily Summary - {datetime.now().strftime('%B %d, %Y')} 📊"
+        subject = f"Daily Summary - {datetime.now().strftime('%B %d, %Y')} "
         
         body = f"""
-<h2>Hi {patient_name}! 📊</h2>
+<h2>Hi {patient_name}! </h2>
 
 <h3>Daily Summary - {datetime.now().strftime('%B %d, %Y')}</h3>
 
@@ -253,12 +253,12 @@ Stay healthy! 💪<br>
     </tr>
 </table>
 
-<h3>💡 Key Insights:</h3>
+<h3> Key Insights:</h3>
 <ul>
 {''.join(f'<li>{insight}</li>' for insight in key_insights)}
 </ul>
 
-<p>Keep up the great work! 💪</p>
+<p>Keep up the great work! </p>
 
 <p><em>- Your Nutrition Team</em></p>
 """
@@ -307,7 +307,7 @@ class MockMessagingService(MessagingService):
         self.smtp_email = None
         self.smtp_password = None
         self.sendgrid_client = None
-        print("🧪 MockMessagingService initialized - emails will be printed to console")
+        print(" MockMessagingService initialized - emails will be printed to console")
     
     def send_email(self, to: str, subject: str, body: str, is_html: bool = True) -> bool:
         print(f"\n📧 [MOCK EMAIL to {to}]")
