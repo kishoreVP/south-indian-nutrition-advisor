@@ -129,7 +129,7 @@ Return ONLY the JSON, no additional text.
             return analysis
             
         except Exception as e:
-            print(f"⚠️ Error analyzing {food_name}: {e}")
+            print(f"Error analyzing {food_name}: {e}")
             # Return default structure
             return {
                 "ingredients": ["Unable to analyze - using defaults"],
@@ -184,7 +184,7 @@ Return ONLY the JSON.
             if json_match:
                 return json.loads(json_match.group())
         except Exception as e:
-            print(f"⚠️ Error getting alternatives: {e}")
+            print(f"Error getting alternatives: {e}")
         
         return {
             "alternatives": [],
