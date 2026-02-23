@@ -210,7 +210,7 @@ Stay healthy! <br>
         subject = f"Reminder: Time for {next_meal.title()}! "
         
         body = f"""
-<h2>Hi {patient_name}! 🍽️</h2>
+<h2>Hi {patient_name}! </h2>
 
 <p>Time for <strong>{next_meal}</strong>! Here are your tips:</p>
 
@@ -336,4 +336,4 @@ if __name__ == "__main__":
         positive_notes=["Good sambar choice"]
     )
     
-    print("\n✅ Test completed!")
+    print("\n Test completed!")
