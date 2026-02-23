@@ -56,7 +56,7 @@ messaging_service = MessagingService()
 
 def analyze_ingredients_with_gemini(state: NutritionState) -> NutritionState:
     """Use Gemini to analyze ingredients in each food item"""
-    print("🔍 Analyzing ingredients with Gemini...")
+    print(" Analyzing ingredients with Gemini...")
     
     ingredient_analysis = {}
     
@@ -81,7 +81,7 @@ def analyze_ingredients_with_gemini(state: NutritionState) -> NutritionState:
 
 def calculate_nutrition_with_gemini(state: NutritionState) -> NutritionState:
     """Calculate nutrition using Gemini's knowledge"""
-    print("📊 Calculating nutrition with Gemini...")
+    print(" Calculating nutrition with Gemini...")
     
     total_nutrition = {
         "calories": 0,
@@ -106,7 +106,7 @@ def calculate_nutrition_with_gemini(state: NutritionState) -> NutritionState:
         summary += f"\n   Nutrition: {analysis['nutrition']}"
         summary += f"\n   Key Ingredients: {', '.join(analysis['ingredients'][:5])}"
         if analysis.get('problematic_ingredients'):
-            summary += f"\n   ⚠️ Concerns: {len(analysis['problematic_ingredients'])} problematic ingredients"
+            summary += f"\n   Concerns: {len(analysis['problematic_ingredients'])} problematic ingredients"
         analysis_summary.append(summary)
     
     return {
@@ -117,7 +117,7 @@ def calculate_nutrition_with_gemini(state: NutritionState) -> NutritionState:
 
 def generate_ingredient_level_recommendations(state: NutritionState) -> NutritionState:
     """Generate detailed ingredient-level recommendations using Gemini"""
-    print("💡 Generating ingredient-level recommendations with Gemini...")
+    print(" Generating ingredient-level recommendations with Gemini...")
     
     recommendations_prompt = f"""You are an expert nutritionist specializing in South Indian cuisine.
 
@@ -174,7 +174,7 @@ Return ONLY valid JSON, no additional text or markdown.
             raise ValueError("No JSON found")
             
     except Exception as e:
-        print(f"⚠️ Error parsing recommendations: {e}")
+        print(f" Error parsing recommendations: {e}")
         # Fallback structure
         recommendations = {
             "immediate_concerns": ["Unable to parse detailed recommendations"],
@@ -195,7 +195,7 @@ Return ONLY valid JSON, no additional text or markdown.
 
 def create_personalized_report(state: NutritionState) -> NutritionState:
     """Create a comprehensive personalized report using Gemini"""
-    print("📋 Creating personalized report with Gemini...")
+    print(" Creating personalized report with Gemini...")
     
     report_prompt = f"""Create a warm, personalized nutrition report for {state.get('patient_name', 'the patient')}.
 
@@ -224,20 +224,20 @@ POSITIVE NOTES:
 
 Create a friendly, actionable report with these sections:
 
-1. 👋 **Warm Greeting** 
+1. **Warm Greeting** 
    - Address {state.get('patient_name', 'them')} by name
    - Acknowledge their effort to track meals
 
-2. 📊 **Quick Summary**
+2.  **Quick Summary**
    - Brief overview of what they ate
    - Total calories and key nutrients
 
-3. ⚠️ **IMMEDIATE CONCERNS**
+3.  **IMMEDIATE CONCERNS**
    - List specific problematic items from their meal
    - Explain WHY each is concerning for their condition
    - Be specific with numbers
 
-4. 🔧 **INGREDIENT-LEVEL MODIFICATIONS**
+4.  **INGREDIENT-LEVEL MODIFICATIONS**
    For EACH dish they ate:
    - What to reduce (with specific amounts: "2 tbsp → 1 tsp")
    - What to avoid completely
@@ -245,19 +245,19 @@ Create a friendly, actionable report with these sections:
    - How to cook it differently
    - Ideal portion size
 
-5. ⏰ **MEAL TIMING ADVICE**
+5.  **MEAL TIMING ADVICE**
    - Is this meal appropriate for this time of day?
    - What changes for next time?
 
-6. ✅ **WHAT YOU DID RIGHT**
+6.  **WHAT YOU DID RIGHT**
    - Specific positive reinforcement
    - Acknowledge good choices
 
-7. 🎯 **ACTION PLAN FOR NEXT MEAL**
+7.  **ACTION PLAN FOR NEXT MEAL**
    - 3-5 specific, actionable changes
    - Make it easy to follow
 
-8. 💪 **Motivational Closing**
+8.  **Motivational Closing**
    - Encouraging words
    - Remind them of their health goals
 
@@ -279,7 +279,7 @@ Return plain text report, no JSON.
         # Extract content properly
         final_report = extract_content(response)
     except Exception as e:
-        print(f"⚠️ Error generating report: {e}")
+        print(f" Error generating report: {e}")
         final_report = f"Report generation encountered an error. Please try again."
     
     return {
@@ -289,13 +289,13 @@ Return plain text report, no JSON.
 
 def send_patient_message(state: NutritionState) -> NutritionState:
     """Send recommendations to patient via Email"""
-    print("📧 Sending email to patient...")
+    print(" Sending email to patient...")
     
     message_sent = False
     patient_email = state.get("patient_email")
     
     if not patient_email:
-        print("⚠️ No email address provided")
+        print(" No email address provided")
         return {**state, "message_sent": False}
     
     # Send email with full report
@@ -310,9 +310,9 @@ def send_patient_message(state: NutritionState) -> NutritionState:
     )
     
     if message_sent:
-        print(f"✅ Email sent to {patient_email}")
+        print(f" Email sent to {patient_email}")
     else:
-        print(f"⚠️ Email printed to console (credentials not configured)")
+        print(f" Email printed to console (credentials not configured)")
     
     return {
         **state,
