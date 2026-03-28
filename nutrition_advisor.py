@@ -32,6 +32,9 @@ class NutritionState(TypedDict):
     ingredient_modifications: Dict[str, Dict]
     final_report: str
     message_sent: bool
+    patient_email: Optional[str]
+    patient_phone: Optional[str]
+    patient_whatsapp: Optional[str]
 
 def extract_content(response):
     """Extract content from Gemini response"""
@@ -386,6 +389,7 @@ def analyze_patient_meal(
         "final_report": "",
         "message_sent": False
     }
+    print("STATE EMAIL:", initial_state.get("patient_email"))
     
     result = app.invoke(initial_state)
     return result
