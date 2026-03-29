@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NutriSense — South Indian Nutrition Advisor</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:        #0d1117;
+      --surface:   #161b22;
+      --card:      #1c2330;
+      --border:    #30363d;
+      --accent:    #f97316;
+      --accent2:   #fb923c;
+      --green:     #22c55e;
+      --red:       #ef4444;
+      --yellow:    #eab308;
+      --text:      #e6edf3;
+      --muted:     #8b949e;
+      --heading:   #f0f6fc;
+      --radius:    14px;
+      --shadow:    0 4px 24px rgba(0,0,0,0.4);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Sora', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ─── SIDEBAR ──────────────────────────────── */
+    .sidebar {
+      position: fixed;
+      left: 0; top: 0; bottom: 0;
+      width: 230px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 0;
+      z-index: 100;
+      transition: transform .3s;
+    }
+    .logo {
+      padding: 22px 20px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: var(--accent);
+      border-radius: 10px;
+      display: grid; place-items: center;
+      font-size: 18px;
+    }
+    .logo-text {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--heading);
+      letter-spacing: -0.3px;
+    }
+    .logo-sub { font-size: 10px; color: var(--muted); font-weight: 400; }
+
+    .nav-section { padding: 14px 12px 4px; }
+    .nav-label { font-size: 9px; color: var(--muted); letter-spacing: 1.2px; text-transform: uppercase; padding: 0 8px 6px; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 12px; border-radius: 9px;
+      cursor: pointer; font-size: 13px; font-weight: 500;
+      color: var(--muted);
+      transition: all .2s;
+      margin-bottom: 2px;
+      text-decoration: none;
+    }
+    .nav-item:hover { background: var(--card); color: var(--text); }
+    .nav-item.active { background: rgba(249,115,22,.15); color: var(--accent); }
+    .nav-item .icon { font-size: 16px; width: 20px; text-align: center; }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 16px;
+      border-top: 1px solid var(--border);
+    }
+    .user-chip {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 10px; border-radius: 9px;
+      cursor: pointer;
+    }
+    .avatar {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), #c2410c);
+      display: grid; place-items: center;
+      font-size: 12px; font-weight: 700; color: #fff;
+    }
+    .user-info { font-size: 12px; }
+    .user-name { font-weight: 600; color: var(--heading); }
+    .user-plan { font-size: 10px; color: var(--accent); }
+
+    /* ─── MAIN ─────────────────────────────────── */
+    .main {
+      margin-left: 230px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .topbar {
+      position: sticky; top: 0; z-index: 90;
+      background: rgba(13,17,23,.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 28px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .topbar-title { font-size: 16px; font-weight: 700; color: var(--heading); flex: 1; }
+    .topbar-date { font-size: 12px; color: var(--muted); }
+
+    .content { padding: 28px; flex: 1; max-width: 1100px; }
+
+    /* ─── PAGE SECTIONS ────────────────────────── */
+    .page { display: none; }
+    .page.active { display: block; animation: fadeIn .25s ease; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ─── GREETING ─────────────────────────────── */
+    .greeting { margin-bottom: 28px; }
+    .greeting h1 {
+      font-size: 26px; font-weight: 800;
+      color: var(--heading); letter-spacing: -0.5px;
+    }
+    .greeting h1 span { color: var(--accent); }
+    .greeting p { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+    /* ─── STATS ROW ────────────────────────────── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    }
+    .stat-card.orange::before { background: var(--accent); }
+    .stat-card.green::before { background: var(--green); }
+    .stat-card.blue::before { background: #60a5fa; }
+    .stat-card.purple::before { background: #a78bfa; }
+    .stat-label { font-size: 11px; color: var(--muted); font-weight: 500; margin-bottom: 6px; text-transform: uppercase; letter-spacing: .5px; }
+    .stat-value { font-size: 28px; font-weight: 800; color: var(--heading); letter-spacing: -1px; }
+    .stat-unit { font-size: 13px; font-weight: 500; color: var(--muted); }
+    .stat-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+    /* ─── TWO-COL LAYOUT ───────────────────────── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    /* ─── CARD ─────────────────────────────────── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .card-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .card-title { font-size: 14px; font-weight: 700; color: var(--heading); }
+    .card-body { padding: 20px; }
+
+    /* ─── LOG MEAL FORM ────────────────────────── */
+    .meal-form { display: flex; flex-direction: column; gap: 16px; }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.full { grid-column: 1 / -1; }
+
+    label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+
+    input, select, textarea {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 10px 14px;
+      font-family: 'Sora', sans-serif;
+      font-size: 13px;
+      color: var(--text);
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+      width: 100%;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(249,115,22,.15);
+    }
+    select option { background: var(--surface); }
+    textarea { resize: vertical; min-height: 70px; }
+
+    /* ─── FOOD ITEMS LIST ──────────────────────── */
+    .food-list { display: flex; flex-direction: column; gap: 8px; }
+    .food-item {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 10px 14px;
+      animation: fadeIn .2s ease;
+    }
+    .food-item-emoji { font-size: 20px; width: 28px; text-align: center; }
+    .food-item-info { flex: 1; }
+    .food-item-name { font-size: 13px; font-weight: 600; color: var(--heading); }
+    .food-item-qty { font-size: 11px; color: var(--muted); }
+    .food-item-remove {
+      width: 24px; height: 24px;
+      background: none; border: none;
+      color: var(--muted); font-size: 16px;
+      cursor: pointer; border-radius: 4px;
+      display: grid; place-items: center;
+      transition: all .2s;
+    }
+    .food-item-remove:hover { background: rgba(239,68,68,.15); color: var(--red); }
+
+    .add-food-row { display: flex; gap: 8px; }
+    .add-food-row input { flex: 1; }
+    .add-food-row .qty-input { width: 120px; flex: none; }
+
+    /* ─── BUTTONS ──────────────────────────────── */
+    .btn {
+      padding: 10px 20px;
+      border-radius: 9px;
+      font-family: 'Sora', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: all .2s;
+      display: inline-flex; align-items: center; gap: 7px;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+    .btn-primary:hover { background: var(--accent2); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(249,115,22,.35); }
+    .btn-primary:disabled { background: var(--border); color: var(--muted); transform: none; box-shadow: none; cursor: not-allowed; }
+    .btn-ghost {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-sm { padding: 7px 14px; font-size: 12px; }
+    .btn-full { width: 100%; justify-content: center; }
+
+    /* ─── CHIP / TAGS ──────────────────────────── */
+    .chips { display: flex; flex-wrap: wrap; gap: 7px; }
+    .chip {
+      padding: 5px 12px; border-radius: 999px;
+      font-size: 11px; font-weight: 600;
+      cursor: pointer; border: 1.5px solid var(--border);
+      color: var(--muted);
+      background: transparent;
+      transition: all .2s;
+      font-family: 'Sora', sans-serif;
+    }
+    .chip:hover { border-color: var(--accent); color: var(--accent); }
+    .chip.selected { background: rgba(249,115,22,.15); border-color: var(--accent); color: var(--accent); }
+
+    /* ─── CIRCULAR PROGRESS ────────────────────── */
+    .ring-wrap {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 20px 0 10px;
+    }
+    .ring-svg { transform: rotate(-90deg); }
+    .ring-bg { fill: none; stroke: var(--border); stroke-width: 10; }
+    .ring-progress {
+      fill: none; stroke: var(--accent);
+      stroke-width: 10;
+      stroke-linecap: round;
+      stroke-dasharray: 377;
+      stroke-dashoffset: 377;
+      transition: stroke-dashoffset 1s ease;
+    }
+    .ring-center {
+      position: absolute;
+      display: flex; flex-direction: column;
+      align-items: center;
+    }
+    .ring-val { font-size: 26px; font-weight: 800; color: var(--heading); letter-spacing: -1px; }
+    .ring-lbl { font-size: 11px; color: var(--muted); font-weight: 500; }
+
+    .macros-list { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
+    .macro-row { display: flex; align-items: center; gap: 10px; }
+    .macro-dot { width: 8px; height: 8px; border-radius: 50%; flex-none; }
+    .macro-name { font-size: 12px; color: var(--muted); flex: 1; }
+    .macro-bar-wrap { flex: 2; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+    .macro-bar { height: 100%; border-radius: 3px; transition: width 1s ease; }
+    .macro-val { font-size: 12px; font-weight: 700; color: var(--heading); min-width: 40px; text-align: right; }
+
+    /* ─── ANALYSIS RESULT ──────────────────────── */
+    .analysis-result { display: none; }
+    .analysis-result.visible { display: block; animation: fadeIn .4s ease; }
+
+    .report-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .report-header {
+      background: linear-gradient(135deg, rgba(249,115,22,.2), rgba(249,115,22,.05));
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 14px;
+    }
+    .report-icon { font-size: 28px; }
+    .report-title { font-size: 17px; font-weight: 800; color: var(--heading); }
+    .report-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    .report-body { padding: 24px; }
+    .report-text {
+      font-family: 'Lora', serif;
+      font-size: 14px;
+      line-height: 1.75;
+      color: var(--text);
+      white-space: pre-wrap;
+    }
+
+    .concerns-list { display: flex; flex-direction: column; gap: 8px; }
+    .concern-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 10px 14px;
+      background: rgba(239,68,68,.08);
+      border: 1px solid rgba(239,68,68,.2);
+      border-radius: 9px;
+      font-size: 13px; color: var(--text);
+    }
+    .concern-icon { font-size: 16px; flex-none; }
+
+    .tips-list { display: flex; flex-direction: column; gap: 8px; }
+    .tip-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 10px 14px;
+      background: rgba(34,197,94,.08);
+      border: 1px solid rgba(34,197,94,.2);
+      border-radius: 9px;
+      font-size: 13px; color: var(--text);
+    }
+
+    /* ─── HISTORY TABLE ────────────────────────── */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th {
+      padding: 10px 16px;
+      text-align: left;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+    }
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(48,54,61,.5);
+      color: var(--text);
+      vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,.02); }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .badge-orange { background: rgba(249,115,22,.15); color: var(--accent); }
+    .badge-green { background: rgba(34,197,94,.15); color: var(--green); }
+    .badge-yellow { background: rgba(234,179,8,.15); color: var(--yellow); }
+    .badge-red { background: rgba(239,68,68,.15); color: var(--red); }
+
+    /* ─── LOADING ──────────────────────────────── */
+    .loader-overlay {
+      display: none;
+      position: fixed; inset: 0; z-index: 999;
+      background: rgba(13,17,23,.85);
+      backdrop-filter: blur(6px);
+      flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 20px;
+    }
+    .loader-overlay.visible { display: flex; }
+    .spinner {
+      width: 52px; height: 52px;
+      border: 4px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loader-text { font-size: 15px; font-weight: 600; color: var(--text); }
+    .loader-steps { font-size: 12px; color: var(--muted); text-align: center; }
+    .loader-step { display: none; }
+    .loader-step.visible { display: block; animation: fadeIn .3s ease; }
+
+    /* ─── NOTIFICATION ─────────────────────────── */
+    .toast {
+      position: fixed; bottom: 28px; right: 28px; z-index: 9999;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 20px;
+      display: flex; align-items: center; gap: 12px;
+      box-shadow: var(--shadow);
+      font-size: 13px;
+      transform: translateY(100px); opacity: 0;
+      transition: all .3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast-icon { font-size: 20px; }
+
+    /* ─── EMPTY STATE ──────────────────────────── */
+    .empty-state {
+      text-align: center; padding: 48px 20px;
+      color: var(--muted);
+    }
+    .empty-state .emoji { font-size: 48px; margin-bottom: 12px; }
+    .empty-state p { font-size: 13px; }
+
+    /* ─── NUTRITION BARS ───────────────────────── */
+    .nutrition-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .nut-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+    }
+    .nut-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+    .nut-value { font-size: 20px; font-weight: 800; color: var(--heading); }
+    .nut-unit { font-size: 12px; color: var(--muted); }
+    .nut-bar-wrap { height: 4px; background: var(--border); border-radius: 2px; margin-top: 8px; overflow: hidden; }
+    .nut-bar { height: 100%; border-radius: 2px; transition: width 1s ease; }
+
+    /* ─── QUICK TIPS SIDEBAR CARD ──────────────── */
+    .tip-sidebar {
+      background: linear-gradient(160deg, rgba(249,115,22,.12), transparent);
+      border: 1px solid rgba(249,115,22,.2);
+      border-radius: var(--radius);
+      padding: 18px;
+      margin-bottom: 16px;
+    }
+    .tip-sidebar-title { font-size: 12px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 10px; }
+    .tip-sidebar-item { font-size: 12px; color: var(--text); padding: 6px 0; border-bottom: 1px solid rgba(48,54,61,.5); display: flex; gap: 8px; }
+    .tip-sidebar-item:last-child { border-bottom: none; }
+
+    /* ─── RESPONSIVE ───────────────────────────── */
+    @media (max-width: 900px) {
+      .sidebar { transform: translateX(-100%); }
+      .main { margin-left: 0; }
+      .stats-row { grid-template-columns: 1fr 1fr; }
+      .two-col { grid-template-columns: 1fr; }
+      .nutrition-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="logo">
+    <div class="logo-icon">🌿</div>
+    <div>
+      <div class="logo-text">NutriSense</div>
+      <div class="logo-sub">South Indian Advisor</div>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Main</div>
+    <a class="nav-item active" onclick="showPage('dashboard')">
+      <span class="icon">🏠</span> Dashboard
+    </a>
+    <a class="nav-item" onclick="showPage('log-meal')">
+      <span class="icon">🍽️</span> Log Meal
+    </a>
+    <a class="nav-item" onclick="showPage('history')">
+      <span class="icon">📋</span> History
+    </a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Profile</div>
+    <a class="nav-item" onclick="showPage('profile')">
+      <span class="icon">👤</span> My Profile
+    </a>
+    <a class="nav-item" onclick="showPage('conditions')">
+      <span class="icon">🩺</span> Health Conditions
+    </a>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="user-chip">
+      <div class="avatar" id="sidebarAvatar">N</div>
+      <div class="user-info">
+        <div class="user-name" id="sidebarName">Nagarjun</div>
+        <div class="user-plan">AI Nutrition Plan</div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="topbarTitle">Dashboard</div>
+    <div class="topbar-date" id="topbarDate"></div>
+  </div>
+
+  <div class="content">
+
+    <!-- ── DASHBOARD PAGE ─────────────────────── -->
+    <div class="page active" id="page-dashboard">
+      <div class="greeting">
+        <h1>Good <span id="greetingTime">morning</span>, <span id="greetingName">Nagarjun</span>! 👋</h1>
+        <p>Here's your nutrition overview for today.</p>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card orange">
+          <div class="stat-label">Calories Today</div>
+          <div><span class="stat-value" id="dashCalories">0</span> <span class="stat-unit">kcal</span></div>
+          <div class="stat-sub">Goal: 2000 kcal</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-label">Protein</div>
+          <div><span class="stat-value" id="dashProtein">0</span> <span class="stat-unit">g</span></div>
+          <div class="stat-sub">Goal: 60g</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-label">Carbs</div>
+          <div><span class="stat-value" id="dashCarbs">0</span> <span class="stat-unit">g</span></div>
+          <div class="stat-sub">Goal: 250g</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-label">Meals Logged</div>
+          <div><span class="stat-value" id="dashMeals">0</span></div>
+          <div class="stat-sub">Today</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Today's Meals</span>
+            <button class="btn btn-ghost btn-sm" onclick="showPage('log-meal')">+ Log Meal</button>
+          </div>
+          <div class="card-body">
+            <div id="todayMealsList">
+              <div class="empty-state">
+                <div class="emoji">🥗</div>
+                <p>No meals logged today.<br>Start by logging your first meal!</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="tip-sidebar">
+            <div class="tip-sidebar-title">💡 Today's Tips</div>
+            <div class="tip-sidebar-item">🌾 <span>Add drumstick (murungakkai) to sambar for extra iron</span></div>
+            <div class="tip-sidebar-item">🥥 <span>Use coconut oil in moderation — 1 tsp per serving</span></div>
+            <div class="tip-sidebar-item">🫙 <span>Fermented foods like idli batter boost gut health</span></div>
+            <div class="tip-sidebar-item">⏰ <span>Eat your largest meal before 2 PM for better digestion</span></div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><span class="card-title">Macro Split</span></div>
+            <div class="card-body">
+              <div class="macros-list">
+                <div class="macro-row">
+                  <div class="macro-dot" style="background:#f97316"></div>
+                  <div class="macro-name">Carbs</div>
+                  <div class="macro-bar-wrap"><div class="macro-bar" id="carbBar" style="width:0%;background:#f97316"></div></div>
+                  <div class="macro-val" id="carbVal">0g</div>
+                </div>
+                <div class="macro-row">
+                  <div class="macro-dot" style="background:#22c55e"></div>
+                  <div class="macro-name">Protein</div>
+                  <div class="macro-bar-wrap"><div class="macro-bar" id="proteinBar" style="width:0%;background:#22c55e"></div></div>
+                  <div class="macro-val" id="proteinVal">0g</div>
+                </div>
+                <div class="macro-row">
+                  <div class="macro-dot" style="background:#60a5fa"></div>
+                  <div class="macro-name">Fat</div>
+                  <div class="macro-bar-wrap"><div class="macro-bar" id="fatBar" style="width:0%;background:#60a5fa"></div></div>
+                  <div class="macro-val" id="fatVal">0g</div>
+                </div>
+                <div class="macro-row">
+                  <div class="macro-dot" style="background:#a78bfa"></div>
+                  <div class="macro-name">Fiber</div>
+                  <div class="macro-bar-wrap"><div class="macro-bar" id="fiberBar" style="width:0%;background:#a78bfa"></div></div>
+                  <div class="macro-val" id="fiberVal">0g</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── LOG MEAL PAGE ──────────────────────── -->
+    <div class="page" id="page-log-meal">
+      <div class="greeting">
+        <h1>Log Your <span>Meal</span> 🍛</h1>
+        <p>Add what you ate and get instant AI-powered nutrition analysis.</p>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Meal Details</span></div>
+          <div class="card-body">
+            <div class="meal-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Meal Time</label>
+                  <select id="mealTime">
+                    <option value="breakfast">🌅 Breakfast</option>
+                    <option value="lunch">☀️ Lunch</option>
+                    <option value="dinner">🌙 Dinner</option>
+                    <option value="snack">🫙 Snack</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Patient Email (for report)</label>
+                  <input type="email" id="patientEmail" placeholder="your@email.com"/>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Add Food Items</label>
+                <div class="add-food-row">
+                  <input type="text" id="foodInput" placeholder="e.g. Idli, Dosa, Sambar…" onkeydown="if(event.key==='Enter')addFood()"/>
+                  <input type="text" class="qty-input" id="qtyInput" placeholder="Qty (e.g. 2 pieces)" onkeydown="if(event.key==='Enter')addFood()"/>
+                  <button class="btn btn-ghost btn-sm" onclick="addFood()">Add</button>
+                </div>
+              </div>
+
+              <!-- Quick add chips -->
+              <div class="form-group">
+                <label>Quick Add</label>
+                <div class="chips">
+                  <button class="chip" onclick="quickAdd('Idli','3 pieces')">Idli</button>
+                  <button class="chip" onclick="quickAdd('Dosa','1 piece')">Dosa</button>
+                  <button class="chip" onclick="quickAdd('Sambar','1 bowl')">Sambar</button>
+                  <button class="chip" onclick="quickAdd('Vada','2 pieces')">Vada</button>
+                  <button class="chip" onclick="quickAdd('Pongal','1 cup')">Pongal</button>
+                  <button class="chip" onclick="quickAdd('Rasam','1 cup')">Rasam</button>
+                  <button class="chip" onclick="quickAdd('Coconut Chutney','2 tbsp')">Coconut Chutney</button>
+                  <button class="chip" onclick="quickAdd('Rice','1 cup cooked')">Rice</button>
+                  <button class="chip" onclick="quickAdd('Curd Rice','1 bowl')">Curd Rice</button>
+                  <button class="chip" onclick="quickAdd('Upma','1 bowl')">Upma</button>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Food Items Added (<span id="foodCount">0</span>)</label>
+                <div class="food-list" id="foodList">
+                  <div class="empty-state" style="padding:16px">
+                    <p>No food items added yet</p>
+                  </div>
+                </div>
+              </div>
+
+              <button class="btn btn-primary btn-full" id="analyzeBtn" onclick="analyzeMeal()" disabled>
+                🔍 Analyze with AI
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT SIDE: conditions -->
+        <div>
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-header"><span class="card-title">Health Conditions</span></div>
+            <div class="card-body">
+              <div class="form-group" style="margin-bottom:0">
+                <label>Select all that apply</label>
+                <div class="chips" id="conditionChips" style="margin-top:8px">
+                  <button class="chip" onclick="toggleCondition(this,'Diabetes')">Diabetes</button>
+                  <button class="chip" onclick="toggleCondition(this,'Hypertension')">Hypertension</button>
+                  <button class="chip" onclick="toggleCondition(this,'Thyroid')">Thyroid</button>
+                  <button class="chip" onclick="toggleCondition(this,'PCOS')">PCOS</button>
+                  <button class="chip" onclick="toggleCondition(this,'Heart Disease')">Heart Disease</button>
+                  <button class="chip" onclick="toggleCondition(this,'Obesity')">Obesity</button>
+                  <button class="chip" onclick="toggleCondition(this,'Anemia')">Anemia</button>
+                  <button class="chip" onclick="toggleCondition(this,'Kidney Disease')">Kidney Disease</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><span class="card-title">How It Works</span></div>
+            <div class="card-body">
+              <div style="display:flex;flex-direction:column;gap:12px;font-size:13px;color:var(--muted)">
+                <div style="display:flex;gap:10px;align-items:flex-start">
+                  <span style="color:var(--accent);font-weight:800;font-size:18px">1</span>
+                  <span>Add the foods you ate with quantities</span>
+                </div>
+                <div style="display:flex;gap:10px;align-items:flex-start">
+                  <span style="color:var(--accent);font-weight:800;font-size:18px">2</span>
+                  <span>Select your health conditions for personalized advice</span>
+                </div>
+                <div style="display:flex;gap:10px;align-items:flex-start">
+                  <span style="color:var(--accent);font-weight:800;font-size:18px">3</span>
+                  <span>Gemini AI analyzes ingredients and generates recommendations</span>
+                </div>
+                <div style="display:flex;gap:10px;align-items:flex-start">
+                  <span style="color:var(--accent);font-weight:800;font-size:18px">4</span>
+                  <span>Get a detailed report sent to your email</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ANALYSIS RESULT SECTION -->
+      <div class="analysis-result" id="analysisResult">
+        <div class="report-card">
+          <div class="report-header">
+            <div class="report-icon">🧠</div>
+            <div>
+              <div class="report-title">AI Nutrition Analysis</div>
+              <div class="report-sub" id="reportSubtitle">South Indian Nutrition Advisor</div>
+            </div>
+          </div>
+          <div class="report-body">
+            <div class="report-text" id="reportText"></div>
+          </div>
+        </div>
+
+        <div class="nutrition-grid" id="nutritionGrid"></div>
+
+        <div class="two-col">
+          <div class="card">
+            <div class="card-header"><span class="card-title">⚠️ Immediate Concerns</span></div>
+            <div class="card-body">
+              <div class="concerns-list" id="concernsList"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">✅ Positive Notes</span></div>
+            <div class="card-body">
+              <div class="tips-list" id="positiveList"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── HISTORY PAGE ────────────────────────── -->
+    <div class="page" id="page-history">
+      <div class="greeting">
+        <h1>Meal <span>History</span> 📋</h1>
+        <p>All your previously analyzed meals in one place.</p>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Past Analyses</span></div>
+        <div class="card-body" style="padding:0">
+          <div class="table-wrap">
+            <table id="historyTable">
+              <thead>
+                <tr>
+                  <th>Date & Time</th>
+                  <th>Meal</th>
+                  <th>Foods</th>
+                  <th>Calories</th>
+                  <th>Condition</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="historyBody">
+                <tr>
+                  <td colspan="6" style="text-align:center;padding:40px;color:var(--muted)">No meal history yet. Start logging meals!</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PROFILE PAGE ────────────────────────── -->
+    <div class="page" id="page-profile">
+      <div class="greeting">
+        <h1>My <span>Profile</span> 👤</h1>
+        <p>Your personal information and health goals.</p>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Personal Details</span></div>
+          <div class="card-body">
+            <div class="meal-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Full Name</label>
+                  <input type="text" id="profileName" placeholder="Your name" oninput="updateProfile()"/>
+                </div>
+                <div class="form-group">
+                  <label>Email</label>
+                  <input type="email" id="profileEmail" placeholder="your@email.com"/>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Age</label>
+                  <input type="number" id="profileAge" placeholder="Age" min="1" max="120"/>
+                </div>
+                <div class="form-group">
+                  <label>Gender</label>
+                  <select id="profileGender">
+                    <option>Male</option>
+                    <option>Female</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Weight (kg)</label>
+                  <input type="number" id="profileWeight" placeholder="e.g. 70"/>
+                </div>
+                <div class="form-group">
+                  <label>Height (cm)</label>
+                  <input type="number" id="profileHeight" placeholder="e.g. 170"/>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Daily Calorie Goal</label>
+                <input type="number" id="profileCalGoal" placeholder="e.g. 2000" value="2000"/>
+              </div>
+              <button class="btn btn-primary" onclick="saveProfile()">💾 Save Profile</button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">API Configuration</span></div>
+          <div class="card-body">
+            <div class="meal-form">
+              <div class="form-group">
+                <label>Backend API URL</label>
+                <input type="text" id="apiUrl" value="http://localhost:8000" placeholder="http://localhost:8000"/>
+              </div>
+              <div class="form-group">
+                <label>Patient ID</label>
+                <input type="text" id="patientId" value="P001" placeholder="e.g. P001"/>
+              </div>
+              <p style="font-size:12px;color:var(--muted)">Connect to your FastAPI backend running <code style="background:var(--surface);padding:2px 6px;border-radius:4px;font-size:11px">uvicorn main:app</code></p>
+              <button class="btn btn-ghost btn-sm" onclick="testConnection()">🔗 Test Connection</button>
+              <div id="connectionStatus" style="font-size:12px;margin-top:8px"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CONDITIONS PAGE ───────────────────── -->
+    <div class="page" id="page-conditions">
+      <div class="greeting">
+        <h1>Health <span>Conditions</span> 🩺</h1>
+        <p>Your conditions are used to personalize every meal analysis.</p>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Manage Conditions</span></div>
+        <div class="card-body">
+          <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Select all conditions that apply. These will be pre-selected when analyzing meals.</p>
+          <div class="chips" id="conditionsPageChips" style="gap:10px">
+            <button class="chip" onclick="toggleGlobalCondition(this,'Diabetes')">🩸 Diabetes</button>
+            <button class="chip" onclick="toggleGlobalCondition(this,'Hypertension')">❤️ Hypertension</button>
+            <button class="chip" onclick="toggleGlobalCondition(this,'Thyroid')">🦋 Thyroid</button>
+            <button class="chip" onclick="toggleGlobalCondition(this,'PCOS')">🌸 PCOS</button>
+            <button class="chip" onclick="toggleGlobalCondition(this,'Heart Disease')">💓 Heart Disease</button>
+            <button class="chip" onclick="toggleGlobalCondition(this,'Obesity')">⚖️ Obesity</button>
+            <button class="chip" onclick="toggleGlobalCondition(this,'Anemia')">🩹 Anemia</button>
+            <button class="chip" onclick="toggleGlobalCondition(this,'Kidney Disease')">🫘 Kidney Disease</button>
+            <button class="chip" onclick="toggleGlobalCondition(this,'Lactose Intolerance')">🥛 Lactose Intolerance</button>
+            <button class="chip" onclick="toggleGlobalCondition(this,'Celiac Disease')">🌾 Celiac Disease</button>
+          </div>
+          <div style="margin-top:20px">
+            <button class="btn btn-primary" onclick="saveConditions()">💾 Save Conditions</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- LOADER -->
+<div class="loader-overlay" id="loader">
+  <div class="spinner"></div>
+  <div class="loader-text">Analyzing your meal…</div>
+  <div class="loader-steps">
+    <div class="loader-step visible" id="step1">🔍 Identifying ingredients in each dish…</div>
+    <div class="loader-step" id="step2">🧮 Calculating nutritional breakdown…</div>
+    <div class="loader-step" id="step3">💡 Generating ingredient-level recommendations…</div>
+    <div class="loader-step" id="step4">📝 Creating your personalized report…</div>
+    <div class="loader-step" id="step5">📧 Sending report to your email…</div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span class="toast-icon" id="toastIcon">✅</span>
+  <span id="toastMsg">Done!</span>
+</div>
+
+<script>
+  // ─── STATE ──────────────────────────────────────
+  const state = {
+    foodItems: [],
+    selectedConditions: [],
+    globalConditions: [],
+    todayNutrition: { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 },
+    todayMeals: [],
+    history: [],
+    profile: { name: 'Ramesh', email: '', age: '', gender: 'Male', weight: '', height: '', calorieGoal: 2000 }
+  };
+
+  const FOOD_EMOJIS = {
+    'idli':'🫓','dosa':'🥞','sambar':'🥣','vada':'🍩','pongal':'🍚','rasam':'🫙',
+    'rice':'🍚','biryani':'🍛','curry':'🍲','chutney':'🥬','upma':'🥣',
+    'payasam':'🍮','appam':'🫓','uttapam':'🥞','default':'🍽️'
+  };
+
+  function getFoodEmoji(name) {
+    const lower = name.toLowerCase();
+    for (const [k, v] of Object.entries(FOOD_EMOJIS)) {
+      if (lower.includes(k)) return v;
+    }
+    return FOOD_EMOJIS.default;
+  }
+
+  // ─── NAVIGATION ─────────────────────────────────
+  function showPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('page-' + id).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n => {
+      if (n.getAttribute('onclick')?.includes(id)) n.classList.add('active');
+    });
+    const titles = { dashboard: 'Dashboard', 'log-meal': 'Log Meal', history: 'History', profile: 'Profile', conditions: 'Health Conditions' };
+    document.getElementById('topbarTitle').textContent = titles[id] || id;
+  }
+
+  // ─── GREETING ────────────────────────────────────
+  function updateGreeting() {
+    const h = new Date().getHours();
+    const g = h < 12 ? 'morning' : h < 17 ? 'afternoon' : 'evening';
+    document.getElementById('greetingTime').textContent = g;
+    const d = new Date();
+    document.getElementById('topbarDate').textContent = d.toLocaleDateString('en-IN', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+  }
+
+  // ─── FOOD ITEMS ──────────────────────────────────
+  function addFood() {
+    const name = document.getElementById('foodInput').value.trim();
+    const qty = document.getElementById('qtyInput').value.trim() || '1 serving';
+    if (!name) return showToast('⚠️', 'Please enter a food name');
+    state.foodItems.push({ name, quantity: qty });
+    document.getElementById('foodInput').value = '';
+    document.getElementById('qtyInput').value = '';
+    renderFoodList();
+    document.getElementById('foodInput').focus();
+  }
+
+  function quickAdd(name, qty) {
+    state.foodItems.push({ name, quantity: qty });
+    renderFoodList();
+  }
+
+  function removeFood(idx) {
+    state.foodItems.splice(idx, 1);
+    renderFoodList();
+  }
+
+  function renderFoodList() {
+    const list = document.getElementById('foodList');
+    const count = state.foodItems.length;
+    document.getElementById('foodCount').textContent = count;
+    document.getElementById('analyzeBtn').disabled = count === 0;
+
+    if (count === 0) {
+      list.innerHTML = '<div class="empty-state" style="padding:16px"><p>No food items added yet</p></div>';
+      return;
+    }
+    list.innerHTML = state.foodItems.map((f, i) => `
+      <div class="food-item">
+        <span class="food-item-emoji">${getFoodEmoji(f.name)}</span>
+        <div class="food-item-info">
+          <div class="food-item-name">${f.name}</div>
+          <div class="food-item-qty">${f.quantity}</div>
+        </div>
+        <button class="food-item-remove" onclick="removeFood(${i})">✕</button>
+      </div>
+    `).join('');
+  }
+
+  // ─── CONDITIONS ──────────────────────────────────
+  function toggleCondition(el, cond) {
+    el.classList.toggle('selected');
+    if (el.classList.contains('selected')) {
+      if (!state.selectedConditions.includes(cond)) state.selectedConditions.push(cond);
+    } else {
+      state.selectedConditions = state.selectedConditions.filter(c => c !== cond);
+    }
+  }
+
+  function toggleGlobalCondition(el, cond) {
+    el.classList.toggle('selected');
+    if (el.classList.contains('selected')) {
+      if (!state.globalConditions.includes(cond)) state.globalConditions.push(cond);
+    } else {
+      state.globalConditions = state.globalConditions.filter(c => c !== cond);
+    }
+  }
+
+  function saveConditions() {
+    showToast('✅', 'Health conditions saved!');
+  }
+
+  // ─── ANALYZE ─────────────────────────────────────
+  async function analyzeMeal() {
+    if (state.foodItems.length === 0) return;
+
+    const conditions = state.selectedConditions.length > 0 ? state.selectedConditions : ['General Health'];
+    const mealTime = document.getElementById('mealTime').value;
+    const email = document.getElementById('patientEmail').value;
+    const apiUrl = document.getElementById('apiUrl')?.value || 'http://localhost:8000';
+    const patientId = document.getElementById('patientId')?.value || 'P001';
+    const patientName = state.profile.name || 'Patient';
+
+    showLoader();
+
+    const payload = {
+      patient_id: patientId,
+      patient_name: patientName,
+      food_items: state.foodItems,
+      medical_conditions: conditions,
+      meal_time: mealTime,
+      patient_email: email || null
+    };
+
+    try {
+      const stepInterval = animateLoaderSteps();
+
+      const response = await fetch(`${apiUrl}/analyze`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      clearInterval(stepInterval);
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({ detail: 'Unknown error' }));
+        throw new Error(err.detail || `HTTP ${response.status}`);
+      }
+
+      const data = await response.json();
+      hideLoader();
+      renderAnalysis(data, mealTime, conditions);
+      saveToHistory(data, mealTime, conditions);
+      updateDashboard(data);
+      showToast('✅', 'Analysis complete! Scroll down to see your report.');
+
+    } catch (err) {
+      clearInterval(window._loaderInterval);
+      hideLoader();
+      showToast('❌', `Error: ${err.message}. Is your backend running?`);
+      console.error(err);
+    }
+  }
+
+  function animateLoaderSteps() {
+    const steps = ['step1','step2','step3','step4','step5'];
+    let i = 0;
+    steps.forEach(s => document.getElementById(s).classList.remove('visible'));
+    document.getElementById(steps[0]).classList.add('visible');
+    window._loaderInterval = setInterval(() => {
+      if (i < steps.length - 1) {
+        document.getElementById(steps[i]).classList.remove('visible');
+        i++;
+        document.getElementById(steps[i]).classList.add('visible');
+      }
+    }, 3000);
+    return window._loaderInterval;
+  }
+
+  // ─── RENDER ANALYSIS ─────────────────────────────
+  function renderAnalysis(data, mealTime, conditions) {
+    document.getElementById('analysisResult').classList.add('visible');
+
+    const nutrition = data.nutritional_breakdown || {};
+    const report = data.final_report || 'Analysis complete.';
+    const concerns = data.detailed_recommendations || [];
+    const positives = data.positive_notes || [];
+
+    // Report text
+    document.getElementById('reportSubtitle').textContent =
+      `${mealTime.charAt(0).toUpperCase() + mealTime.slice(1)} · ${conditions.join(', ')} · Powered by Gemini AI`;
+    document.getElementById('reportText').textContent = report;
+
+    // Nutrition grid
+    const nutItems = [
+      { label: 'Calories', value: Math.round(nutrition.calories || 0), unit: 'kcal', color: '#f97316', max: 2000 },
+      { label: 'Carbs', value: Math.round(nutrition.carbs || 0), unit: 'g', color: '#60a5fa', max: 250 },
+      { label: 'Protein', value: Math.round(nutrition.protein || 0), unit: 'g', color: '#22c55e', max: 60 },
+      { label: 'Fat', value: Math.round(nutrition.fat || 0), unit: 'g', color: '#a78bfa', max: 65 },
+      { label: 'Fiber', value: Math.round(nutrition.fiber || 0), unit: 'g', color: '#fb923c', max: 30 },
+      { label: 'Sodium', value: Math.round(nutrition.sodium || 0), unit: 'mg', color: '#f43f5e', max: 2300 }
+    ];
+    document.getElementById('nutritionGrid').innerHTML = nutItems.map(n => `
+      <div class="nut-item">
+        <div class="nut-label">${n.label}</div>
+        <div><span class="nut-value">${n.value}</span> <span class="nut-unit">${n.unit}</span></div>
+        <div class="nut-bar-wrap"><div class="nut-bar" style="width:${Math.min(100, (n.value/n.max)*100)}%;background:${n.color}"></div></div>
+      </div>
+    `).join('');
+
+    // Concerns
+    const cl = document.getElementById('concernsList');
+    cl.innerHTML = concerns.length > 0
+      ? concerns.map(c => `<div class="concern-item"><span class="concern-icon">⚠️</span><span>${c}</span></div>`).join('')
+      : '<div style="color:var(--muted);font-size:13px">No major concerns identified 🎉</div>';
+
+    // Positives
+    const pl = document.getElementById('positiveList');
+    pl.innerHTML = positives.length > 0
+      ? positives.map(p => `<div class="tip-item"><span>✅</span><span>${p}</span></div>`).join('')
+      : '<div style="color:var(--muted);font-size:13px">Analysis complete. Check the full report above.</div>';
+
+    // Scroll into view
+    setTimeout(() => {
+      document.getElementById('analysisResult').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  }
+
+  // ─── HISTORY ─────────────────────────────────────
+  function saveToHistory(data, mealTime, conditions) {
+    const entry = {
+      date: new Date().toLocaleString('en-IN'),
+      mealTime,
+      foods: state.foodItems.map(f => f.name).join(', '),
+      calories: Math.round(data.nutritional_breakdown?.calories || 0),
+      conditions: conditions.join(', '),
+      emailSent: data.message_sent
+    };
+    state.history.unshift(entry);
+    renderHistory();
+  }
+
+  function renderHistory() {
+    const tbody = document.getElementById('historyBody');
+    if (state.history.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--muted)">No meal history yet.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = state.history.map(h => `
+      <tr>
+        <td style="color:var(--muted)">${h.date}</td>
+        <td><span class="badge badge-orange">${h.mealTime}</span></td>
+        <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${h.foods}</td>
+        <td><strong>${h.calories}</strong> kcal</td>
+        <td style="color:var(--muted);font-size:12px">${h.conditions}</td>
+        <td>${h.emailSent ? '<span class="badge badge-green">📧 Sent</span>' : '<span class="badge badge-yellow">No email</span>'}</td>
+      </tr>
+    `).join('');
+  }
+
+  // ─── DASHBOARD UPDATE ────────────────────────────
+  function updateDashboard(data) {
+    const n = data.nutritional_breakdown || {};
+    state.todayNutrition.calories += Math.round(n.calories || 0);
+    state.todayNutrition.protein += Math.round(n.protein || 0);
+    state.todayNutrition.carbs += Math.round(n.carbs || 0);
+    state.todayNutrition.fat += Math.round(n.fat || 0);
+    state.todayNutrition.fiber += Math.round(n.fiber || 0);
+    state.todayMeals.push({ foods: state.foodItems.map(f=>f.name), mealTime: document.getElementById('mealTime').value, calories: Math.round(n.calories||0) });
+
+    document.getElementById('dashCalories').textContent = state.todayNutrition.calories;
+    document.getElementById('dashProtein').textContent = state.todayNutrition.protein;
+    document.getElementById('dashCarbs').textContent = state.todayNutrition.carbs;
+    document.getElementById('dashMeals').textContent = state.todayMeals.length;
+
+    // Macro bars
+    const goal = { carbs: 250, protein: 60, fat: 65, fiber: 30 };
+    ['carbs','protein','fat','fiber'].forEach(m => {
+      const pct = Math.min(100, (state.todayNutrition[m] / goal[m]) * 100);
+      document.getElementById(m + 'Bar').style.width = pct + '%';
+      document.getElementById(m + 'Val').textContent = state.todayNutrition[m] + 'g';
+    });
+
+    // Today's meals list
+    document.getElementById('todayMealsList').innerHTML = state.todayMeals.map(m => `
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
+        <span style="font-size:18px">${m.mealTime === 'breakfast' ? '🌅' : m.mealTime === 'lunch' ? '☀️' : m.mealTime === 'dinner' ? '🌙' : '🫙'}</span>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:600;color:var(--heading)">${m.mealTime.charAt(0).toUpperCase() + m.mealTime.slice(1)}</div>
+          <div style="font-size:11px;color:var(--muted)">${m.foods.join(', ')}</div>
+        </div>
+        <div style="font-size:13px;font-weight:700;color:var(--accent)">${m.calories} kcal</div>
+      </div>
+    `).join('');
+  }
+
+  // ─── PROFILE ─────────────────────────────────────
+  function updateProfile() {
+    const name = document.getElementById('profileName').value || 'User';
+    state.profile.name = name;
+    document.getElementById('greetingName').textContent = name;
+    document.getElementById('sidebarName').textContent = name.split(' ')[0];
+    document.getElementById('sidebarAvatar').textContent = name.charAt(0).toUpperCase();
+    document.getElementById('greetingName').textContent = name;
+  }
+
+  function saveProfile() {
+    updateProfile();
+    showToast('✅', 'Profile saved!');
+  }
+
+  // ─── API TEST ─────────────────────────────────────
+  async function testConnection() {
+    const url = document.getElementById('apiUrl').value;
+    const el = document.getElementById('connectionStatus');
+    el.textContent = '⏳ Testing…';
+    try {
+      const r = await fetch(`${url}/health`, { signal: AbortSignal.timeout(4000) });
+      if (r.ok) {
+        el.style.color = 'var(--green)';
+        el.textContent = '✅ Connected successfully!';
+      } else {
+        throw new Error(`HTTP ${r.status}`);
+      }
+    } catch (e) {
+      el.style.color = 'var(--red)';
+      el.textContent = `❌ Could not connect: ${e.message}`;
+    }
+  }
+
+  // ─── LOADER ──────────────────────────────────────
+  function showLoader() { document.getElementById('loader').classList.add('visible'); }
+  function hideLoader() { document.getElementById('loader').classList.remove('visible'); }
+
+  // ─── TOAST ───────────────────────────────────────
+  function showToast(icon, msg) {
+    const t = document.getElementById('toast');
+    document.getElementById('toastIcon').textContent = icon;
+    document.getElementById('toastMsg').textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 4000);
+  }
+
+  // ─── INIT ─────────────────────────────────────────
+  updateGreeting();
+</script>
+</body>
+</html>
