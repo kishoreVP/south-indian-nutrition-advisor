@@ -8,12 +8,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 if not os.getenv("GOOGLE_API_KEY"):
-    print("❌ Set GOOGLE_API_KEY in .env file")
+    print("Set GOOGLE_API_KEY in .env file")
     exit(1)
 
 from nutrition_advisor import analyze_patient_meal
 
-print("\n🤖 SMART NUTRITION ADVISOR")
+print("\nSMART NUTRITION ADVISOR")
 print("="*70)
 
 # Analyze meal with Email notification
@@ -32,13 +32,13 @@ result = analyze_patient_meal(
 
 # Print the full report
 print("\n" + "="*70)
-print("📋 FULL NUTRITION REPORT")
+print("FULL NUTRITION REPORT")
 print("="*70)
 print(result["final_report"])
 
 # Print nutrition summary
 print("\n" + "="*70)
-print("📊 NUTRITION SUMMARY")
+print("NUTRITION SUMMARY")
 print("="*70)
 print(f"Calories: {result['nutritional_breakdown']['calories']:.0f} kcal")
 print(f"Carbs: {result['nutritional_breakdown']['carbs']:.0f}g")
